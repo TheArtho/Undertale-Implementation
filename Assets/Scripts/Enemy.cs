@@ -1,14 +1,26 @@
-﻿public class Monster
+﻿public class Enemy
 {
       #region Parameters
       
       public string name { get; private set; }
 
       public int maxHP;
-      public int hp
+
+      private int _hp;
+      public int Hp
       {
-            get => hp;
-            set { hp = value < 0 ? 0 : value; }
+            get => maxHP;
+            set
+            {
+                  if (value >= 0 && value <= maxHP)
+                  {
+                        _hp = value;
+                  }
+                  else
+                  {
+                        _hp = value < 0 ? 0 : maxHP;
+                  }
+            }
       }
       
       #endregion
@@ -19,16 +31,21 @@
       
       #endregion
 
-      public Monster(string name, int hp)
+      public Enemy(string name, int hp)
       {
             this.name = name;
             maxHP = hp;
-            this.hp = hp;
+            this.Hp = hp;
             battleText = new[]
             {
                   string.Format("{0} came out of the earth!", name),
                   string.Format("{0}'s here for your health.", name),
                   string.Format("{0} seems kind of bruised", name)
             };
+      }
+
+      public void SetDamage(int damage)
+      {
+            _hp = _hp - damage;
       }
 }

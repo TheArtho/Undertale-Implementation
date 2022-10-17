@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class Battle
@@ -24,18 +25,34 @@ public class Battle
   }
   
   #endregion
+
+  #region Data Structures
+
+  private struct PlayerChoice
+  {
+    public int command;
+    public int target;
+  }
+
+  #endregion
+  
+  #region Parameters
+
+  private const int maxEnemy = 2;
   
   private BattleScene scene;
 
   private Player player;
-  private Monster[] opponents;
+  private Enemy[] opponents;
 
   private int turnCount;
   private BattleResult result;
 
-  private BattleCommand lastCommand;
+  private BattleChoice lastChoice;
+  
+  #endregion
 
-  public Battle(BattleScene scene, Player player, Monster[] opponents)
+  public Battle(BattleScene scene, Player player, Enemy[] opponents)
   {
     this.scene = scene;
     this.player = player;
@@ -44,6 +61,11 @@ public class Battle
 
   public void StartBattle()
   {
+    if (opponents.Length > maxEnemy)
+    {
+      Debug.LogWarning("the number of enemies is too much (2 at max)");
+    }
+    
     Debug.Log($"[Battle] Starting battle: {player.name} against {opponents[0]}");
     result = BattleResult.IN_PROGRESS;
     try
@@ -71,8 +93,9 @@ public class Battle
     #region Main Battle Part
     do
     {
+      Debug.Log($"Turn #{turnCount+1}");
       yield return scene.StartCoroutine(PlayerCommandPhase());
-      switch (lastCommand)
+      switch (lastChoice.command)
       {
         case BattleCommand.FIGHT:
           yield return scene.StartCoroutine(PlayerAttackPhase());
@@ -105,29 +128,45 @@ public class Battle
 
   private IEnumerator PlayerCommandPhase()
   {
-    BattleCommand cmd = BattleCommand.FIGHT;
+    Debug.Log("[Battle] Player Command Phase");
+    bool commandChosen = false;
+    do
+    {
+      // Base Command Selection
+      BattleCommand cmd = BattleCommand.FIGHT;
 
-    yield return scene.StartCoroutine(scene.CommandMenu(value => cmd = (BattleCommand) value));
-    lastCommand = cmd;
-    
-    Debug.Log($"Command chosen is {cmd}");
+      yield return scene.StartCoroutine(scene.CommandMenu(value => cmd = (BattleCommand) value));
 
-    if (cmd == BattleCommand.FIGHT)
-    {
+      Debug.Log($"Command chosen is {cmd}");
+
+      if (cmd == BattleCommand.FIGHT)
+      {
+        // Target Selection
+        int target = 0;
       
-    }
-    else if (cmd == BattleCommand.ACT)
-    {
-      
-    }
-    else if (cmd == BattleCommand.ITEM)
-    {
-      
-    }
-    else if (cmd == BattleCommand.MERCY)
-    {
-      
-    }
+        yield return scene.StartCoroutine(scene.TargetSelection(opponents, value => target = value));
+
+        if (target == -1) {
+          Debug.Log("CANCELLING");
+          continue; // CANCEL
+        }
+
+        lastChoice = new BattleFightChoice(target);
+        commandChosen = true;
+      }
+      else if (cmd == BattleCommand.ACT)
+      {
+        throw new NotImplementedException();
+      }
+      else if (cmd == BattleCommand.ITEM)
+      {
+        throw new NotImplementedException();
+      }
+      else if (cmd == BattleCommand.MERCY)
+      {
+        throw new NotImplementedException();
+      }
+    } while (!commandChosen);
   }
 
   /// <summary>
@@ -136,7 +175,20 @@ public class Battle
   /// <returns></returns>
   private IEnumerator PlayerAttackPhase()
   {
-    throw new NotImplementedException();
+    Debug.Log("[Battle] Player Attack Phase");
+    int position = int.MaxValue;
+    int damageToDeal;
+
+    scene.SetActiveSoul(false);
+    scene.ResetCommandMenu();
+
+    yield return scene.StartCoroutine(scene.PlayerAttack(value => position = value));
+
+    damageToDeal = CalculateDamage(position);
+    
+    Debug.Log($"Damage to deal = {damageToDeal}");
+
+    yield return scene.StartCoroutine(DealDamage(lastChoice.target, damageToDeal));
   }
   
   /// <summary>
@@ -145,6 +197,7 @@ public class Battle
   /// <returns></returns>
   private IEnumerator PlayerActPhase()
   {
+    Debug.Log("[Battle] Player Act Phase");
     throw new NotImplementedException();
   }
   
@@ -154,6 +207,7 @@ public class Battle
   /// <returns></returns>
   private IEnumerator PlayerMercyPhase()
   {
+    Debug.Log("[Battle] Player Mercy Phase");
     throw new NotImplementedException();
   }
   
@@ -163,6 +217,7 @@ public class Battle
   /// <returns></returns>
   private IEnumerator PlayerItemPhase()
   {
+    Debug.Log("[Battle] Player Item Phase");
     throw new NotImplementedException();
   }
 
@@ -172,6 +227,7 @@ public class Battle
   /// <returns></returns>
   private IEnumerator EnemyAttackPhase()
   {
+    Debug.Log("[Battle] Enemy Attack Phase");
     throw new NotImplementedException();
   }
 
@@ -181,6 +237,7 @@ public class Battle
   /// <returns></returns>
   private IEnumerator EndTurnPhase()
   {
+    Debug.Log("[Battle] End Turn Phase");
     throw new NotImplementedException();
   }
 
@@ -190,7 +247,34 @@ public class Battle
   /// <returns></returns>
   private IEnumerator BattleEndPhase()
   {
+    Debug.Log("[Battle] Battle End Phase");
     throw new NotImplementedException();
+  }
+  
+  #endregion
+  
+  #region Sub Phase Coroutines
+
+  /// <summary>
+  /// Deals the input damage to the target
+  /// </summary>
+  /// <param name="target"></param>
+  /// <param name="damage"></param>
+  /// <returns></returns>
+  private IEnumerator DealDamage(int target, int damage)
+  {
+    Enemy opponent = opponents[target];
+    int oldHp = opponent.Hp;
+    
+    // Attack Animation
+    // Displays the health bar
+    // Damage animation
+
+    opponent.SetDamage(damage);
+    
+    Debug.Log($"Enemy #{target} {opponent.name} : #{oldHp} => #{opponent.Hp}");
+    
+    yield return true;
   }
   
   #endregion
@@ -227,6 +311,11 @@ public class Battle
   private void GameOver()
   {
     scene.StopAllCoroutines();
+  }
+
+  private int CalculateDamage(int position)
+  {
+    return 25;
   }
   
   #endregion

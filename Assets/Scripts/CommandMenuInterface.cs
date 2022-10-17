@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BattleInterface : MonoBehaviour
+// CommandMenu
+public class CommandMenuInterface : MonoBehaviour
 {
-    [SerializeField] private GameObject commandMenu;
     [SerializeField] private int choiceCommand ;
+    [SerializeField] private Image soul;
 
     [Header("CommandMenu Sprites")] 
     [SerializeField] private Sprite[] commandMenuButtons = new Sprite[4];
@@ -21,12 +22,12 @@ public class BattleInterface : MonoBehaviour
     private void UpdateCommandMenu()
     {
         int i = 0;
-        foreach (Transform button in commandMenu.transform)
+        foreach (Transform button in transform)
         {
             if (i == choiceCommand) // Currently selected button
             {
                 button.GetComponent<Image>().sprite = commandMenuButtonsSelected[i];
-                //TODO place the heart soul at the button's position
+                soul.rectTransform.position = button.GetComponent<RectTransform>().position;
             }
             else // Other selected buttons
             {
@@ -34,7 +35,16 @@ public class BattleInterface : MonoBehaviour
             }
             i++;
         }
-    } 
+    }
+
+    public void ResetMenu()
+    {
+        int i = 0;
+        foreach (Transform button in transform)
+        {
+            button.GetComponent<Image>().sprite = commandMenuButtons[i];
+        }
+    }
 
     /// <summary>
     /// Returns the BattleCommand (int) as a callback parameter
@@ -47,22 +57,28 @@ public class BattleInterface : MonoBehaviour
     /// <returns></returns>
     public IEnumerator CommandMenu(System.Action<int> result = null)
     {
+        UpdateCommandMenu();
+        
         do
         {
-            if (Input.GetKey(KeyCode.LeftArrow) && choiceCommand > 0)
+            if (Input.GetKeyDown(KeyCode.LeftArrow) && choiceCommand > 0)
             {
                 choiceCommand--;
                 UpdateCommandMenu();
                 //TODO Play Scroll SFX
+
+                yield return new WaitForSeconds(0.1f);
             }
-            else if (Input.GetKey(KeyCode.RightArrow) && choiceCommand < 3)
+            else if (Input.GetKeyDown(KeyCode.RightArrow) && choiceCommand < 3)
             {
                 choiceCommand++;
                 UpdateCommandMenu();
                 //TODO Play Scroll SFX
+                
+                yield return new WaitForSeconds(0.1f);
             }
 
-            if (Input.GetKey(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Return))
             {
                 //TODO Play Select SFX
                 if (result != null)
