@@ -43,6 +43,7 @@ public class CommandMenuInterface : MonoBehaviour
         foreach (Transform button in transform)
         {
             button.GetComponent<Image>().sprite = commandMenuButtons[i];
+            i++;
         }
     }
 
@@ -61,17 +62,23 @@ public class CommandMenuInterface : MonoBehaviour
         
         do
         {
-            if (Input.GetKeyDown(KeyCode.LeftArrow) && choiceCommand > 0)
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 choiceCommand--;
+
+                if (choiceCommand < 0) choiceCommand = 3;
+                
                 UpdateCommandMenu();
                 //TODO Play Scroll SFX
 
                 yield return new WaitForSeconds(0.1f);
             }
-            else if (Input.GetKeyDown(KeyCode.RightArrow) && choiceCommand < 3)
+            else if (Input.GetKeyDown(KeyCode.RightArrow))
             {
                 choiceCommand++;
+                
+                if (choiceCommand > 3) choiceCommand = 0;
+                
                 UpdateCommandMenu();
                 //TODO Play Scroll SFX
                 

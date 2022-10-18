@@ -6,7 +6,16 @@ using UnityEngine.UI;
 
 public class BattleScene : MonoBehaviour
 {
+    #region Constants
+
+    private readonly float boxTransformTime = 0.5f;
+    private readonly Vector2 defaultBoxSize = new Vector2(575, 140);
+    private readonly Vector2 defaultBoxPosition = new Vector2(0, -81);
+
+    #endregion
+    
     private Battle battle;
+    [SerializeField] private Image dialogBox;
     [SerializeField] private CommandMenuInterface commandMenuInterface;
     [SerializeField] private TargetSelectionInterface targetSelectionInterfaceInterface;
     [SerializeField] private PlayerAttackHandler playerAttackHandler;
@@ -55,10 +64,15 @@ public class BattleScene : MonoBehaviour
         yield return new WaitForEndOfFrame();
     }
 
-    public IEnumerator PlayerAttack(System.Action<int> result)
+    public IEnumerator StartPlayerAttack(System.Action<int> result)
     {
         yield return StartCoroutine(playerAttackHandler.DefaultAttack(result));
         yield return new WaitForEndOfFrame();
+    }
+
+    public IEnumerator HideAttackMeter()
+    {
+        yield return StartCoroutine(playerAttackHandler.DismissAttackMeter());
     }
 
     public void SetActiveSoul(bool value)
@@ -66,8 +80,35 @@ public class BattleScene : MonoBehaviour
         soul.gameObject.SetActive(value);
     }
 
+    public void CenterSoul()
+    {
+        soul.rectTransform.position = dialogBox.rectTransform.position;
+    }
+
     public void ResetCommandMenu()
     {
         commandMenuInterface.ResetMenu();
+    }
+
+    public IEnumerator SetBoxSize(Vector2 size, float time)
+    {
+        LeanTween.size(dialogBox.rectTransform, size, time);
+        yield return new WaitForSeconds(time);
+    }
+
+    public IEnumerator ResetBoxSize()
+    {
+        yield return StartCoroutine(SetBoxSize(defaultBoxSize, boxTransformTime));
+    }
+    
+    public IEnumerator SetBoxPosition(Vector2 position, float time)
+    {
+        LeanTween.moveLocal(dialogBox.gameObject, position, time);
+        yield return new WaitForSeconds(time);
+    }
+    
+    public IEnumerator ResetBoxPosition()
+    {
+        yield return  StartCoroutine(SetBoxPosition(defaultBoxPosition, boxTransformTime));
     }
 }

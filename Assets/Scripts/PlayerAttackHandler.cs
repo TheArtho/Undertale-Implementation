@@ -7,10 +7,29 @@ using UnityEngine.UI;
 
 public class PlayerAttackHandler : MonoBehaviour
 {
+    private RectTransform _rectTransform;
+    
+    [SerializeField] private RectTransform dialogBox;
     [SerializeField] private GameObject attackBar;
 
     private bool isRunning = false;
     private int waitInputId;
+
+    private void Awake()
+    {
+        _rectTransform = GetComponent<RectTransform>();
+    }
+
+    private void Start()
+    {
+        GetComponent<Image>().color = Color.clear;
+    }
+
+    private void Update()
+    {
+        // Makes the attack meter size dependent of the dialog box
+        _rectTransform.sizeDelta = new Vector2(dialogBox.sizeDelta.x - 29, dialogBox.sizeDelta.y - 25);
+    }
 
     private bool GetAttackInput(RectTransform attackBarRect)
     {
@@ -27,7 +46,8 @@ public class PlayerAttackHandler : MonoBehaviour
     {
         // The attack system might chance depending on the weapon of the player, so this code should be called from an external function
         // Default Attack system
-
+        attackBar.SetActive(true);
+        
         GetComponent<Image>().color = Color.white;
         
         Coroutine waitInput = StartCoroutine(WaitInput());
@@ -53,9 +73,10 @@ public class PlayerAttackHandler : MonoBehaviour
         isRunning = false;
     }
 
-    private IEnumerator DismissAttackMeter()
+    public IEnumerator DismissAttackMeter()
     {
+        attackBar.SetActive(false);
         GetComponent<Image>().color = Color.clear;
-        yield return null;
+        yield return 0.5f;
     }
 }

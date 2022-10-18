@@ -1,4 +1,7 @@
-﻿public class Enemy
+﻿using System;
+using UnityEngine;
+
+public class Enemy
 {
       #region Parameters
       
@@ -9,7 +12,7 @@
       private int _hp;
       public int Hp
       {
-            get => maxHP;
+            get => _hp;
             set
             {
                   if (value >= 0 && value <= maxHP)
@@ -22,6 +25,11 @@
                   }
             }
       }
+      
+      public bool isSpared = false;
+      public bool IsFainted => Hp <= 0;
+
+      protected readonly EnemyAttack[] attacks;
       
       #endregion
       
@@ -42,10 +50,42 @@
                   string.Format("{0}'s here for your health.", name),
                   string.Format("{0} seems kind of bruised", name)
             };
+            attacks = new EnemyAttack[]
+            {
+                  new Vegetoid_Attack_01(),
+                  new Vegetoid_Attack_02()
+            };
       }
 
-      public void SetDamage(int damage)
+      public void InitializeAttacks(Battle battle)
       {
-            _hp = _hp - damage;
+            for (int i = 0; i < attacks.Length; ++i)
+            {
+                  attacks[i].Initialize(battle, this);
+            }
+      }
+
+      public virtual int AttackChoice()
+      {
+            // Default attack choice is randomly picking from the attacks array
+            return UnityEngine.Random.Range(0, attacks.Length);
+      }
+      
+      public virtual bool CanSpare()
+      {
+            // Checks if the conditions to be spared are complete
+            return false;
+      }
+
+      public virtual Color GetNameColor()
+      {
+            // Can be overriden for custom purposes
+            return CanSpare() ? Color.yellow : Color.white;
+      }
+
+      public EnemyAttack GetAttack(int index)
+      {
+            Debug.Assert(index >= 0 && index < attacks.Length);
+            return attacks[index];
       }
 }

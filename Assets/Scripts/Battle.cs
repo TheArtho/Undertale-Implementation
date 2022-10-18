@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class Battle
 {
@@ -19,9 +20,8 @@ public class Battle
   public enum BattleResult
   {
     IN_PROGRESS = -1,
-    KILLED = 0,
-    SPARED = 1,
-    GAMEOVER = 2
+    LOST = 0,
+    WON = 1
   }
   
   #endregion
@@ -40,7 +40,7 @@ public class Battle
 
   private const int maxEnemy = 2;
   
-  private BattleScene scene;
+  public BattleScene scene { get; private set; }
 
   private Player player;
   private Enemy[] opponents;
@@ -49,19 +49,27 @@ public class Battle
   private BattleResult result;
 
   private BattleChoice lastChoice;
+  private int[] enemiesChoice;
   
   #endregion
 
+  #region Constructors
   public Battle(BattleScene scene, Player player, Enemy[] opponents)
   {
     this.scene = scene;
     this.player = player;
     this.opponents = opponents;
+
+    foreach (var o in opponents)
+    {
+      o.InitializeAttacks(this);
+    }
   }
+  #endregion
 
   public void StartBattle()
   {
-    if (opponents.Length > maxEnemy)
+    if (CountOpponentsActive() > maxEnemy)
     {
       Debug.LogWarning("the number of enemies is too much (2 at max)");
     }
@@ -176,19 +184,21 @@ public class Battle
   private IEnumerator PlayerAttackPhase()
   {
     Debug.Log("[Battle] Player Attack Phase");
-    int position = int.MaxValue;
+    int position = 0;
     int damageToDeal;
 
     scene.SetActiveSoul(false);
     scene.ResetCommandMenu();
 
-    yield return scene.StartCoroutine(scene.PlayerAttack(value => position = value));
+    yield return scene.StartCoroutine(scene.StartPlayerAttack(value => position = value));
 
     damageToDeal = CalculateDamage(position);
     
     Debug.Log($"Damage to deal = {damageToDeal}");
 
     yield return scene.StartCoroutine(DealDamage(lastChoice.target, damageToDeal));
+
+    scene.StartCoroutine(scene.HideAttackMeter());
   }
   
   /// <summary>
@@ -227,8 +237,15 @@ public class Battle
   /// <returns></returns>
   private IEnumerator EnemyAttackPhase()
   {
+    // Only implementing the attack phase of the first enemy for now
     Debug.Log("[Battle] Enemy Attack Phase");
-    throw new NotImplementedException();
+
+    int enemyIndex = 0;
+    EnemyAttack attack = opponents[enemyIndex].GetAttack(enemyIndex);
+    
+    Debug.Log($"{opponents[enemyIndex]} starts {attack}");
+
+    yield return scene.StartCoroutine(attack.Use());
   }
 
   /// <summary>
@@ -265,16 +282,16 @@ public class Battle
   {
     Enemy opponent = opponents[target];
     int oldHp = opponent.Hp;
-    
+
     // Attack Animation
     // Displays the health bar
     // Damage animation
 
-    opponent.SetDamage(damage);
-    
+    opponent.Hp -= damage;
+
     Debug.Log($"Enemy #{target} {opponent.name} : #{oldHp} => #{opponent.Hp}");
     
-    yield return true;
+    yield return null;
   }
   
   #endregion
@@ -302,7 +319,32 @@ public class Battle
   /// <returns></returns>
   private void EnemyCommandPhase()
   {
-    throw new NotImplementedException();
+    if (CheckBattleState()) return;
+    enemiesChoice = new int[opponents.Length];
+    for (int i = 0; i < opponents.Length; ++i)
+    {
+      // For each opponent, choose an attack
+      Enemy currentOpponent = opponents[i];
+      Debug.Assert(currentOpponent != null);
+
+      if (currentOpponent.IsFainted || currentOpponent.isSpared) continue;
+      
+      enemiesChoice[i] = currentOpponent.AttackChoice();
+    }
+  }
+
+  /// <summary>
+  /// Checks if the battle has to over and update the battle result
+  /// </summary>
+  private bool CheckBattleState()
+  {
+    if (CountOpponentsActive() == 0)
+    {
+      result = BattleResult.WON;
+      return true;
+    }
+
+    return false;
   }
 
   /// <summary>
@@ -312,10 +354,26 @@ public class Battle
   {
     scene.StopAllCoroutines();
   }
+  
+  // Algo Methods
 
   private int CalculateDamage(int position)
   {
     return 25;
+  }
+
+  private int CountOpponentsActive()
+  {
+    int amount = 0;
+    for (int i = 0; i < opponents.Length; ++i)
+    {
+      Debug.Assert(opponents[i] != null);
+      if (!opponents[i].IsFainted && !opponents[i].isSpared)
+      {
+        amount++;
+      }
+    }
+    return amount;
   }
   
   #endregion

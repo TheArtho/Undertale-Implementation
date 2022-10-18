@@ -26,6 +26,7 @@ public class TargetSelectionInterface : MonoBehaviour
             {
                 button.gameObject.SetActive(true);
                 button.Find("Name").GetComponent<Text>().text = $"* {opponents[i].name}";
+                button.Find("Name").GetComponent<Text>().color = opponents[i].GetNameColor();
                 button.Find("HP Bar").GetComponent<Slider>().maxValue = opponents[i].maxHP;
                 button.Find("HP Bar").GetComponent<Slider>().value = opponents[i].Hp;
             }
