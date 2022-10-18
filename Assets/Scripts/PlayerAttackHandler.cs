@@ -33,7 +33,7 @@ public class PlayerAttackHandler : MonoBehaviour
 
     private bool GetAttackInput(RectTransform attackBarRect)
     {
-        return Input.GetKeyDown(KeyCode.Return) && attackBarRect.localPosition.x >= -275 &&
+        return InputManager.Main.GetKeyDown(InputManager.Key.Select) && attackBarRect.localPosition.x >= -275 &&
                attackBarRect.localPosition.x <= 275;
     }
 

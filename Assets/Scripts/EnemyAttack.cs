@@ -21,9 +21,13 @@ public class EnemyAttack
               // Resize of the dodge area
               battle.scene.StartCoroutine(battle.scene.SetBoxPosition(areaPosition, 0.5f));
               yield return battle.scene.StartCoroutine(battle.scene.SetBoxSize(areaSize, 0.5f));
+
+              battle.scene.MoveSoul(true);
               
               // Dodge phase
               yield return new WaitForSeconds(5);
+              
+              battle.scene.MoveSoul(false);
        }
        
        public override string ToString()

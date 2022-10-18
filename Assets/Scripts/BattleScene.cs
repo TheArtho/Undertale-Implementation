@@ -47,7 +47,7 @@ public class BattleScene : MonoBehaviour
     public IEnumerator CommandMenu(System.Action<int> result)
     {
         yield return StartCoroutine(commandMenuInterface.CommandMenu(result));
-        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(0.05f);
     }
 
     /// <summary>
@@ -61,13 +61,13 @@ public class BattleScene : MonoBehaviour
     public IEnumerator TargetSelection(Enemy[] opponents, System.Action<int> result = null)
     {
         yield return StartCoroutine(targetSelectionInterfaceInterface.TargetSelection(opponents, result));
-        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(0.05f);
     }
 
     public IEnumerator StartPlayerAttack(System.Action<int> result)
     {
         yield return StartCoroutine(playerAttackHandler.DefaultAttack(result));
-        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(0.05f);
     }
 
     public IEnumerator HideAttackMeter()
@@ -110,5 +110,10 @@ public class BattleScene : MonoBehaviour
     public IEnumerator ResetBoxPosition()
     {
         yield return  StartCoroutine(SetBoxPosition(defaultBoxPosition, boxTransformTime));
+    }
+
+    public void MoveSoul(bool value)
+    {
+        soul.GetComponent<SoulController>().canMove = value;
     }
 }

@@ -65,7 +65,7 @@ public class TargetSelectionInterface : MonoBehaviour
         
         do
         {
-            if (Input.GetKeyDown(KeyCode.DownArrow) && target > 0)
+            if (InputManager.Main.GetKeyDown(InputManager.Key.DownArrow) && target > 0)
             {
                 target--;
                 UpdateTargetSelection(opponents);
@@ -73,7 +73,7 @@ public class TargetSelectionInterface : MonoBehaviour
                 
                 yield return new WaitForSeconds(0.1f);
             }
-            else if (Input.GetKeyDown(KeyCode.UpArrow) && target < opponents.Length)
+            else if (InputManager.Main.GetKeyDown(InputManager.Key.UpArrow) && target < opponents.Length)
             {
                 target++;
                 UpdateTargetSelection(opponents);
@@ -82,7 +82,7 @@ public class TargetSelectionInterface : MonoBehaviour
                 yield return new WaitForSeconds(0.1f);
             }
 
-            if (Input.GetKeyDown(KeyCode.Return))
+            if (InputManager.Main.GetKeyDown(InputManager.Key.Select))
             {
                 //TODO Play Select SFX
                 if (result != null)
@@ -93,7 +93,7 @@ public class TargetSelectionInterface : MonoBehaviour
 
                 break;
             }
-            else if (Input.GetKeyDown(KeyCode.LeftShift))
+            if (InputManager.Main.GetKeyDown(InputManager.Key.Cancel))
             {
                 //TODO Play Cancel SFX
                 if (result != null)

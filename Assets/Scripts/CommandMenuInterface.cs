@@ -63,7 +63,7 @@ public class CommandMenuInterface : MonoBehaviour
         
         do
         {
-            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            if (InputManager.Main.GetKeyDown(InputManager.Key.LeftArrow))
             {
                 choiceCommand--;
 
@@ -74,7 +74,7 @@ public class CommandMenuInterface : MonoBehaviour
 
                 yield return new WaitForSeconds(0.1f);
             }
-            else if (Input.GetKeyDown(KeyCode.RightArrow))
+            else if (InputManager.Main.GetKeyDown(InputManager.Key.RightArrow))
             {
                 choiceCommand++;
                 
@@ -86,7 +86,7 @@ public class CommandMenuInterface : MonoBehaviour
                 yield return new WaitForSeconds(0.1f);
             }
 
-            if (Input.GetKeyDown(KeyCode.Return))
+            if (InputManager.Main.GetKeyDown(InputManager.Key.Select))
             {
                 //TODO Play Select SFX
                 if (result != null)
