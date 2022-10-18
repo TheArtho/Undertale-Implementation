@@ -59,6 +59,7 @@ public class CommandMenuInterface : MonoBehaviour
     public IEnumerator CommandMenu(System.Action<int> result = null)
     {
         UpdateCommandMenu();
+        soul.gameObject.SetActive(true);
         
         do
         {

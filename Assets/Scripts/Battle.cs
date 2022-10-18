@@ -123,12 +123,14 @@ public class Battle
       EnemyCommandPhase();
       yield return scene.StartCoroutine(EnemyAttackPhase());
       yield return scene.StartCoroutine(EndTurnPhase());
-      
+      // Going to the next turn
+      turnCount++;
     } while (result == BattleResult.IN_PROGRESS);
     #endregion
     
     #region End of the Battle
     yield return scene.StartCoroutine(BattleEndPhase());
+    Debug.Log($"You {result}");
     #endregion
   }
 
@@ -239,13 +241,22 @@ public class Battle
   {
     // Only implementing the attack phase of the first enemy for now
     Debug.Log("[Battle] Enemy Attack Phase");
+    
+    if (CheckBattleState()) yield break;
 
     int enemyIndex = 0;
     EnemyAttack attack = opponents[enemyIndex].GetAttack(enemyIndex);
     
     Debug.Log($"{opponents[enemyIndex]} starts {attack}");
 
+    scene.SetActiveSoul(true);
+    scene.CenterSoul();
+    
     yield return scene.StartCoroutine(attack.Use());
+    
+    scene.SetActiveSoul(false);
+    scene.StartCoroutine(scene.ResetBoxPosition());
+    yield return scene.StartCoroutine(scene.ResetBoxSize());
   }
 
   /// <summary>
@@ -255,7 +266,7 @@ public class Battle
   private IEnumerator EndTurnPhase()
   {
     Debug.Log("[Battle] End Turn Phase");
-    throw new NotImplementedException();
+    yield return null;
   }
 
   /// <summary>
@@ -265,7 +276,7 @@ public class Battle
   private IEnumerator BattleEndPhase()
   {
     Debug.Log("[Battle] Battle End Phase");
-    throw new NotImplementedException();
+    yield return true;
   }
   
   #endregion

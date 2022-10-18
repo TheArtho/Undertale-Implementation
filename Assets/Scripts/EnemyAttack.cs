@@ -19,8 +19,6 @@ public class EnemyAttack
        public virtual IEnumerator Use()
        {
               // Resize of the dodge area
-              battle.scene.SetActiveSoul(true);
-              battle.scene.CenterSoul();
               battle.scene.StartCoroutine(battle.scene.SetBoxPosition(areaPosition, 0.5f));
               yield return battle.scene.StartCoroutine(battle.scene.SetBoxSize(areaSize, 0.5f));
               
