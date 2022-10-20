@@ -45,7 +45,7 @@ public class Battle
   private Player player;
   private Enemy[] opponents;
 
-  private int turnCount;
+  public int turnCount { get; private set; }
   private BattleResult result;
 
   private BattleChoice lastChoice;
@@ -62,7 +62,7 @@ public class Battle
 
     foreach (var o in opponents)
     {
-      o.InitializeAttacks(this);
+      o.Initialize(this);
     }
   }
   #endregion
@@ -249,9 +249,6 @@ public class Battle
     
     Debug.Log($"{opponents[enemyIndex]} starts {attack}");
 
-    scene.SetActiveSoul(true);
-    scene.CenterSoul();
-    
     yield return scene.StartCoroutine(attack.Use());
     
     scene.SetActiveSoul(false);

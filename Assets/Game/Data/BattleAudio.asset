@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3b3f077c7adc146b7cdcde6c3ddac3, type: 3}
+  m_Name: BattleAudio
+  m_EditorClassIdentifier: 
+  database:
+  - key: scroll
+    value: {fileID: 8300000, guid: 0760384755c4a84448362454179bd254, type: 3}
+  - key: damage
+    value: {fileID: 8300000, guid: 500c14605817005498287927a0bc5856, type: 3}
+  - key: hurt
+    value: {fileID: 8300000, guid: 202fae06dbccbbb40a2d6bb843afb738, type: 3}
+  - key: select
+    value: {fileID: 8300000, guid: 459b64afe09eac148b0ad9737df58132, type: 3}

@@ -15,7 +15,9 @@ public class BattleScene : MonoBehaviour
     #endregion
     
     private Battle battle;
-    [SerializeField] private Image dialogBox;
+    [SerializeField] public AudioDatabase audio;
+    [FormerlySerializedAs("dialogBox")] public Image battleBox;
+    [SerializeField] private GameObject battleInterface;
     [SerializeField] private CommandMenuInterface commandMenuInterface;
     [SerializeField] private TargetSelectionInterface targetSelectionInterfaceInterface;
     [SerializeField] private PlayerAttackHandler playerAttackHandler;
@@ -82,7 +84,19 @@ public class BattleScene : MonoBehaviour
 
     public void CenterSoul()
     {
-        soul.rectTransform.position = dialogBox.rectTransform.position;
+        soul.rectTransform.position = battleBox.rectTransform.position;
+    }
+
+    public void ToggleBattleSoul(bool value)
+    {
+        if (value)
+        {
+            soul.transform.SetParent(battleBox.transform.Find("Mask/DodgeArea"));
+        }
+        else
+        {
+            soul.transform.SetParent(battleInterface.transform);
+        }
     }
 
     public void ResetCommandMenu()
@@ -92,7 +106,7 @@ public class BattleScene : MonoBehaviour
 
     public IEnumerator SetBoxSize(Vector2 size, float time)
     {
-        LeanTween.size(dialogBox.rectTransform, size, time);
+        LeanTween.size(battleBox.rectTransform, size, time);
         yield return new WaitForSeconds(time);
     }
 
@@ -103,7 +117,7 @@ public class BattleScene : MonoBehaviour
     
     public IEnumerator SetBoxPosition(Vector2 position, float time)
     {
-        LeanTween.moveLocal(dialogBox.gameObject, position, time);
+        LeanTween.moveLocal(battleBox.gameObject, position, time);
         yield return new WaitForSeconds(time);
     }
     

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 public class Enemy
@@ -30,6 +31,9 @@ public class Enemy
       public bool IsFainted => Hp <= 0;
 
       protected readonly EnemyAttack[] attacks;
+
+      public Battle battle  { get; private set; }
+      public int turnCount { get; private set; }
       
       #endregion
       
@@ -57,7 +61,13 @@ public class Enemy
             };
       }
 
-      public void InitializeAttacks(Battle battle)
+      public void Initialize(Battle battle)
+      {
+            this.battle = battle;
+            InitializeAttacks(battle);
+      }
+
+      private void InitializeAttacks(Battle battle)
       {
             for (int i = 0; i < attacks.Length; ++i)
             {
@@ -65,16 +75,44 @@ public class Enemy
             }
       }
 
+      /// <summary>
+      /// Chooses an attack depending on the situation
+      /// </summary>
+      /// <returns></returns>
       public virtual int AttackChoice()
       {
             // Default attack choice is randomly picking from the attacks array
             return UnityEngine.Random.Range(0, attacks.Length);
       }
-      
+
+      /// <summary>
+      /// Checks if the conditions to be spared are complete
+      /// </summary>
+      /// <returns></returns>
       public virtual bool CanSpare()
       {
             // Checks if the conditions to be spared are complete
             return false;
+      }
+      
+      /// <summary>
+      /// Custom Behavior depending on the situation
+      /// </summary>
+      /// <returns></returns>
+      public virtual IEnumerator StartTurnBehaviour()
+      {
+            // Custom Behavior depending on the situation
+            yield return null;
+      }
+
+      /// <summary>
+      /// Additional behavior at the end of the turn
+      /// </summary>
+      /// <returns></returns>
+      public virtual IEnumerator EndTurnBehavior()
+      {
+            // Additional effects for the Enemy at the end of the turn
+            yield return null;
       }
 
       public virtual Color GetNameColor()
@@ -87,5 +125,10 @@ public class Enemy
       {
             Debug.Assert(index >= 0 && index < attacks.Length);
             return attacks[index];
+      }
+
+      public void UpdateTurn()
+      {
+            turnCount = battle.turnCount;
       }
 }

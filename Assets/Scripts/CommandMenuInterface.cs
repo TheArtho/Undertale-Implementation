@@ -6,6 +6,7 @@ using UnityEngine.UI;
 // CommandMenu
 public class CommandMenuInterface : MonoBehaviour
 {
+    [SerializeField] private AudioDatabase audio ;
     [SerializeField] private int choiceCommand ;
     [SerializeField] private Image soul;
 
@@ -70,7 +71,7 @@ public class CommandMenuInterface : MonoBehaviour
                 if (choiceCommand < 0) choiceCommand = 3;
                 
                 UpdateCommandMenu();
-                //TODO Play Scroll SFX
+                AudioHandler.Main.PlaySFX(audio.Get("scroll"));
 
                 yield return new WaitForSeconds(0.1f);
             }
@@ -81,14 +82,14 @@ public class CommandMenuInterface : MonoBehaviour
                 if (choiceCommand > 3) choiceCommand = 0;
                 
                 UpdateCommandMenu();
-                //TODO Play Scroll SFX
+                AudioHandler.Main.PlaySFX(audio.Get("scroll"));
                 
                 yield return new WaitForSeconds(0.1f);
             }
 
             if (InputManager.Main.GetKeyDown(InputManager.Key.Select))
             {
-                //TODO Play Select SFX
+                AudioHandler.Main.PlaySFX(audio.Get("select"));
                 if (result != null)
                 {
                     Debug.Assert(choiceCommand is >= 0 and <= 3);

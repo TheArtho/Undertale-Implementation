@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class TargetSelectionInterface : MonoBehaviour
 {
     private int target;
+    [SerializeField] public AudioDatabase audio;
     [SerializeField] private Image soul;
     
     private void Start()
@@ -67,6 +68,7 @@ public class TargetSelectionInterface : MonoBehaviour
         {
             if (InputManager.Main.GetKeyDown(InputManager.Key.DownArrow) && target > 0)
             {
+                AudioHandler.Main.PlaySFX(audio.Get("scroll"));
                 target--;
                 UpdateTargetSelection(opponents);
                 //TODO Play Scroll SFX
@@ -75,6 +77,7 @@ public class TargetSelectionInterface : MonoBehaviour
             }
             else if (InputManager.Main.GetKeyDown(InputManager.Key.UpArrow) && target < opponents.Length)
             {
+                AudioHandler.Main.PlaySFX(audio.Get("scroll"));
                 target++;
                 UpdateTargetSelection(opponents);
                 //TODO Play Scroll SFX
@@ -84,7 +87,7 @@ public class TargetSelectionInterface : MonoBehaviour
 
             if (InputManager.Main.GetKeyDown(InputManager.Key.Select))
             {
-                //TODO Play Select SFX
+                AudioHandler.Main.PlaySFX(audio.Get("select"));
                 if (result != null)
                 {
                     Debug.Assert(target is >= -1 and <= 3);
