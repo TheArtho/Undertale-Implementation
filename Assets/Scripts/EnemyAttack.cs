@@ -63,11 +63,11 @@ public class Vegetoid_Attack_01 : EnemyAttack
        {
               // Instantiates falling carrots in the area
               List<GameObject> bullets = new List<GameObject>();
-              
               Coroutine instantiation = battle.scene.StartCoroutine(Instantiation(bullets));
               
               yield return new WaitForSeconds(3);
 
+              // Kills the carrots
               foreach (var b in bullets)
               {
                      GameObject.Destroy(b);
@@ -77,7 +77,7 @@ public class Vegetoid_Attack_01 : EnemyAttack
 
        private IEnumerator Instantiation(List<GameObject> bullets)
        {
-              float delay = 0.3f;
+              float delay = 0.15f;
               GameObject prefab = Resources.Load<GameObject>("Prefabs/Falling Carrot");
               RectTransform box = battle.scene.battleBox.GetComponent<RectTransform>();
 
@@ -86,8 +86,8 @@ public class Vegetoid_Attack_01 : EnemyAttack
                      GameObject bullet = GameObject.Instantiate(prefab, box.transform.Find("Mask/DodgeArea"));
                      bullet.GetComponent<RectTransform>().localPosition = 
                             new Vector3(
-                                   UnityEngine.Random.Range(box.sizeDelta.x*-0.5f, box.sizeDelta.x*0.5f),
-                                   box.sizeDelta.y*0.5f,
+                                   UnityEngine.Random.Range(box.sizeDelta.x*-0.5f+13, box.sizeDelta.x*0.5f-13),
+                                   box.sizeDelta.y*0.5f-5,
                                    0
                                    );
                      bullets.Add(bullet);
@@ -98,6 +98,42 @@ public class Vegetoid_Attack_01 : EnemyAttack
 
 public class Vegetoid_Attack_02 : EnemyAttack
 {
+       public override IEnumerator Attack()
+       {
+              // Instantiates bullets in the area
+              List<GameObject> bullets = new List<GameObject>();
+              Coroutine instantiation = battle.scene.StartCoroutine(Instantiation(bullets));
+              
+              yield return new WaitForSeconds(5);
+
+              // Kills the bullets
+              foreach (var b in bullets)
+              {
+                     GameObject.Destroy(b);
+              }
+              battle.scene.StopCoroutine(instantiation);
+       }
+
+       private IEnumerator Instantiation(List<GameObject> bullets)
+       {
+              float delay = 0.65f;
+              GameObject prefab = Resources.Load<GameObject>("Prefabs/Bouncy Vegetable");
+              RectTransform box = battle.scene.battleBox.GetComponent<RectTransform>();
+
+              while (true)
+              {
+                     GameObject bullet = GameObject.Instantiate(prefab, box.transform.Find("Mask/DodgeArea"));
+                     bullet.GetComponent<RectTransform>().localPosition = 
+                            new Vector3(
+                                   UnityEngine.Random.Range(box.sizeDelta.x*-0.5f+13, box.sizeDelta.x*0.5f-13),
+                                   box.sizeDelta.y*0.5f-5,
+                                   0
+                            );
+                     bullets.Add(bullet);
+                     yield return new WaitForSeconds(delay);
+              }
+       }
+       
        public override string ToString()
        {
               return "Vegetoid Attack #2";

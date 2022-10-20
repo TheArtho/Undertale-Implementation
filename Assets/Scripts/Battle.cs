@@ -245,8 +245,8 @@ public class Battle
     if (CheckBattleState()) yield break;
 
     int enemyIndex = 0;
-    EnemyAttack attack = opponents[enemyIndex].GetAttack(enemyIndex);
-    
+    EnemyAttack attack = opponents[enemyIndex].GetAttack(enemiesChoice[enemyIndex]);
+
     Debug.Log($"{opponents[enemyIndex]} starts {attack}");
 
     yield return scene.StartCoroutine(attack.Use());

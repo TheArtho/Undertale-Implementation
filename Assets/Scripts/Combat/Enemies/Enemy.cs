@@ -30,7 +30,7 @@ public class Enemy
       public bool isSpared = false;
       public bool IsFainted => Hp <= 0;
 
-      protected readonly EnemyAttack[] attacks;
+      protected EnemyAttack[] attacks;
 
       public Battle battle  { get; private set; }
       public int turnCount { get; private set; }
@@ -39,7 +39,7 @@ public class Enemy
       
       #region Hardcoded Variables
 
-      public string[] battleText { get; private set; }
+      public string[] battleText { get; protected set; }
       
       #endregion
 
@@ -48,17 +48,7 @@ public class Enemy
             this.name = name;
             maxHP = hp;
             this.Hp = hp;
-            battleText = new[]
-            {
-                  string.Format("{0} came out of the earth!", name),
-                  string.Format("{0}'s here for your health.", name),
-                  string.Format("{0} seems kind of bruised", name)
-            };
-            attacks = new EnemyAttack[]
-            {
-                  new Vegetoid_Attack_01(),
-                  new Vegetoid_Attack_02()
-            };
+            attacks = new EnemyAttack[] {new EnemyAttack()};
       }
 
       public void Initialize(Battle battle)
@@ -82,6 +72,7 @@ public class Enemy
       public virtual int AttackChoice()
       {
             // Default attack choice is randomly picking from the attacks array
+            if (attacks.Length == 0) return -1;
             return UnityEngine.Random.Range(0, attacks.Length);
       }
 

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Combat.Enemies;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -27,10 +28,13 @@ public class BattleScene : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        StartCoroutine(SetBoxSize(defaultBoxSize, 0));
+        StartCoroutine(SetBoxPosition(defaultBoxPosition, 0));
+        
         Player p = new Player("Chara", 2);
-        Enemy m = new Enemy("Vegetoid", 70);
+        Vegetoid m = new Vegetoid("Vegetoid", 70);
 
-        battle = new Battle(this, p, new[] {m});
+        battle = new Battle(this, p, new Enemy[] {m});
         
         battle.StartBattle();
     }
