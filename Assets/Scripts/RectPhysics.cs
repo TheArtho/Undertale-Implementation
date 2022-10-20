@@ -21,7 +21,7 @@ public class RectPhysics : MonoBehaviour
     {
         CalculateVelocity();
 
-        _rect.position += new Vector3(velocity.x, velocity.y, 0)*0.1f;
+        _rect.position += new Vector3(velocity.x, velocity.y, 0) * Time.deltaTime * 100;
     }
 
     private void CalculateVelocity()
