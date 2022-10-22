@@ -60,9 +60,9 @@ public class Battle
     this.player = player;
     this.opponents = opponents;
 
-    foreach (var o in opponents)
+    for (int i = 0; i < opponents.Length; ++i)
     {
-      o.Initialize(this);
+      opponents[i].Initialize(this, i);
     }
   }
   #endregion
@@ -71,7 +71,7 @@ public class Battle
   {
     if (CountOpponentsActive() > maxEnemy)
     {
-      Debug.LogWarning("the number of enemies is too much (2 at max)");
+      Debug.LogWarning("The number of enemies is higher than 2");
     }
     
     Debug.Log($"[Battle] Starting battle: {player.name} against {opponents[0]}");
@@ -93,8 +93,8 @@ public class Battle
   private IEnumerator BattleCore()
   {
     #region Initialization
-
-    scene.StartCoroutine(DisplayMessage("Encounter Message"));
+    
+    
     
     #endregion
     
@@ -102,7 +102,13 @@ public class Battle
     do
     {
       Debug.Log($"Turn #{turnCount+1}");
+
+      scene.ResetDialogBox();
+      scene.DrawDialogBox();
+      yield return scene.StartCoroutine(DisplayMessage($"* {opponents[0].battleText[turnCount % opponents[0].battleText.Length]}"));
+      
       yield return scene.StartCoroutine(PlayerCommandPhase());
+
       switch (lastChoice.command)
       {
         case BattleCommand.FIGHT:
@@ -142,6 +148,8 @@ public class Battle
     bool commandChosen = false;
     do
     {
+      scene.DrawDialogBox();
+      
       // Base Command Selection
       BattleCommand cmd = BattleCommand.FIGHT;
 
@@ -149,6 +157,8 @@ public class Battle
 
       Debug.Log($"Command chosen is {cmd}");
 
+      scene.UndrawDialogBox();
+      
       if (cmd == BattleCommand.FIGHT)
       {
         // Target Selection
@@ -201,6 +211,11 @@ public class Battle
     yield return scene.StartCoroutine(DealDamage(lastChoice.target, damageToDeal));
 
     scene.StartCoroutine(scene.HideAttackMeter());
+
+    if (opponents[lastChoice.target].IsFainted)
+    {
+      yield return scene.StartCoroutine( opponents[lastChoice.target].Faint());
+    }
   }
   
   /// <summary>
@@ -273,7 +288,19 @@ public class Battle
   private IEnumerator BattleEndPhase()
   {
     Debug.Log("[Battle] Battle End Phase");
-    yield return true;
+
+    if (result == BattleResult.WON)
+    {
+      scene.StopBGM();
+      
+      scene.ResetDialogBox();
+      scene.DrawDialogBox();
+      yield return scene.StartCoroutine(DisplayMessageAndWait("* You WON!\n* You earned 6 XP and 1 gold."));
+    }
+    else
+    {
+      yield return null;
+    }
   }
   
   #endregion
@@ -312,9 +339,14 @@ public class Battle
   /// <returns></returns>
   private IEnumerator DisplayMessage(string message)
   {
-    //TODO link the method to a dialog box of the battle scene
     Debug.Log(message);
-    yield return null;
+    yield return scene.StartCoroutine(scene.DisplayMessage(message));
+  }
+
+  private IEnumerator DisplayMessageAndWait(string message)
+  {
+    Debug.Log(message);
+    yield return scene.StartCoroutine(scene.DisplayMessageAndWait(message));
   }
   
   #endregion

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   database:
   - key: scroll
-    value: {fileID: 8300000, guid: 0760384755c4a84448362454179bd254, type: 3}
+    value: {fileID: 8300000, guid: 810c8d70821185342848440caa9aa1f9, type: 3}
   - key: damage
     value: {fileID: 8300000, guid: 500c14605817005498287927a0bc5856, type: 3}
   - key: hurt

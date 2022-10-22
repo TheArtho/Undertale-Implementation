@@ -2,6 +2,9 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// Most of the logic can be overriden in a extending class to match with the behaviour of the new enemy
+/// </summary>
 public class Enemy
 {
       #region Parameters
@@ -28,11 +31,12 @@ public class Enemy
       }
       
       public bool isSpared = false;
-      public bool IsFainted => Hp <= 0;
+      public bool IsFainted => (Hp <= 0);
 
       protected EnemyAttack[] attacks;
 
-      public Battle battle  { get; private set; }
+      public Battle battle { get; private set; }
+      public int battlerIndex { get; private set; }
       public int turnCount { get; private set; }
       
       #endregion
@@ -51,9 +55,10 @@ public class Enemy
             attacks = new EnemyAttack[] {new EnemyAttack()};
       }
 
-      public void Initialize(Battle battle)
+      public void Initialize(Battle battle, int battlerIndex)
       {
             this.battle = battle;
+            this.battlerIndex = battlerIndex;
             InitializeAttacks(battle);
       }
 
@@ -106,12 +111,28 @@ public class Enemy
             yield return null;
       }
 
+      /// <summary>
+      /// Faint animation
+      /// </summary>
+      /// <returns></returns>
+      public virtual IEnumerator Faint()
+      {
+            battle.scene.battlers[battlerIndex].color = Color.clear;
+            yield return null;
+      }
+
       public virtual Color GetNameColor()
       {
             // Can be overriden for custom purposes
             return CanSpare() ? Color.yellow : Color.white;
       }
 
+      public virtual string GetStartText()
+      {
+            // Custom text showing in the dialog box at the start of each turn
+            return battleText[0] ?? "Please insert text";
+      }
+      
       public EnemyAttack GetAttack(int index)
       {
             Debug.Assert(index >= 0 && index < attacks.Length);

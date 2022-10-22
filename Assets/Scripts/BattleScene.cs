@@ -16,14 +16,26 @@ public class BattleScene : MonoBehaviour
     #endregion
     
     private Battle battle;
+    
+    [Header("Components")]
+    
+    [Space]
+    
     [SerializeField] public AudioDatabase audio;
     [FormerlySerializedAs("dialogBox")] public Image battleBox;
     [SerializeField] private GameObject battleInterface;
     [SerializeField] private CommandMenuInterface commandMenuInterface;
     [SerializeField] private TargetSelectionInterface targetSelectionInterfaceInterface;
     [SerializeField] private PlayerAttackHandler playerAttackHandler;
-    
+    [SerializeField] private DialogBox textBox;
     [SerializeField] private Image soul;
+    public SpriteRenderer[] battlers = new SpriteRenderer[3];
+    
+    [Header("Assets")]
+    
+    [Space]
+    
+    [SerializeField] private AudioClip battleMusic;
     
     // Start is called before the first frame update
     void Start()
@@ -35,7 +47,8 @@ public class BattleScene : MonoBehaviour
         Vegetoid m = new Vegetoid("Vegetoid", 70);
 
         battle = new Battle(this, p, new Enemy[] {m});
-        
+
+        AudioHandler.Main.PlayBGM(battleMusic, 1);
         battle.StartBattle();
     }
     
@@ -133,5 +146,40 @@ public class BattleScene : MonoBehaviour
     public void MoveSoul(bool value)
     {
         soul.GetComponent<SoulController>().canMove = value;
+    }
+
+    public IEnumerator DisplayMessage(string text)
+    {
+        yield return StartCoroutine(textBox.DrawText(text));
+    }
+
+    public IEnumerator DisplayMessageAndWait(string text)
+    {
+        yield return StartCoroutine(textBox.DrawText(text));
+        
+        while (!InputManager.Main.GetKeyDown(InputManager.Key.Select) && !InputManager.Main.GetKeyDown(InputManager.Key.Cancel))
+        {
+            yield return null;
+        }
+    }
+    
+    public void DrawDialogBox()
+    {
+        textBox.gameObject.SetActive(true);
+    }
+
+    public void UndrawDialogBox()
+    {
+        textBox.gameObject.SetActive(false);
+    }
+
+    public void ResetDialogBox()
+    {
+        textBox.DrawDialogBox(Color.white);
+    }
+
+    public void StopBGM()
+    {
+        AudioHandler.Main.StopBGM();
     }
 }
